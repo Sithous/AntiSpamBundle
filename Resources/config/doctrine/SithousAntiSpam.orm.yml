@@ -1,0 +1,29 @@
+Sithous\AntiSpamBundle\Entity\SithousAntiSpam:
+    type: entity
+    table: null
+    repositoryClass: Sithous\AntiSpamBundle\Entity\SithousAntiSpamRepository
+    id:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+    fields:
+        ip:
+            type: string
+            length: 45
+        userObject:
+            type: string
+            length: 255
+        userId:
+            type: integer
+        identifier:
+            type: string
+            length: 255
+        maxCalls:
+            type: integer
+        maxTime:
+            type: integer
+        dateTime:
+            type: datetime
+    lifecycleCallbacks: {  }

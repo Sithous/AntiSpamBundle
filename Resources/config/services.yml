@@ -1,0 +1,5 @@
+services:
+    sithous.antispam:
+        class:     Sithous\AntiSpamBundle\Service\AntiSpam
+        arguments:
+            entityManager: "@service_container"
