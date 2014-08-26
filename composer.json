@@ -1,0 +1,28 @@
+{
+    "name": "sithous/antispam-bundle",
+    "type": "symfony-bundle",
+    "description": "Provides Anti-Spam capabilities to Symfony in an easy to use package..",
+    "keywords": [ "anti spam", "brute force", "protection" ],
+    "homepage": "http://github.com/sithous",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Skylar Sadlier",
+            "email": "skylord@sithous.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.2",
+        "symfony/framework-bundle": "~2.3",
+        "symfony/console": "~2.3"
+    },
+    "autoload": {
+        "psr-0": { "FOS\\JsRoutingBundle": "" }
+    },
+    "target-dir": "Sithous/AntiSpamBundle",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "dev"
+        }
+    }
+}
