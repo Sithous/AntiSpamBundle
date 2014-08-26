@@ -17,7 +17,7 @@
         "symfony/console": "~2.3"
     },
     "autoload": {
-        "psr-0": { "Sithous\\SithousAntiSpam": "" }
+        "psr-0": { "Sithous\\AntiSpamBundle": "" }
     },
     "target-dir": "Sithous/AntiSpamBundle",
     "extra": {
