@@ -1,5 +1,4 @@
 services:
     sithous.antispam:
         class:     Sithous\AntiSpamBundle\Service\AntiSpam
-        arguments:
-            entityManager: "@service_container"
+        arguments: [ @doctrine.orm.entity_manager, @security.context, %sithous_anti_spam% ]

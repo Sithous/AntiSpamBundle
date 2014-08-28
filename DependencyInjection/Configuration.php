@@ -6,20 +6,45 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
- * This is the class that validates and merges configuration from your app/config files
+ * Configuration class.
  *
- * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/extension.html#cookbook-bundles-extension-config-class}
+ * @author      William DURAND <william.durand1@gmail.com>
  */
 class Configuration implements ConfigurationInterface
 {
     /**
-     * {@inheritDoc}
+     * Generates the configuration tree builder.
+     *
+     * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('sithous_antispambundle');
+        $builder = new TreeBuilder();
 
-        return $treeBuilder;
+        $builder->root('sithous_anti_spam')
+            ->children()
+                ->arrayNode('identifiers')
+                    ->prototype('array')
+                        ->children()
+                            ->booleanNode('track_ip')
+                                ->isRequired()
+                            ->end()
+                            ->booleanNode('track_user')
+                                ->isRequired()
+                            ->end()
+                            ->integerNode('max_time')
+                                ->min(1)
+                                ->isRequired()
+                            ->end()
+                            ->integerNode('max_calls')
+                                ->min(1)
+                                ->isRequired()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
+
+        return $builder;
     }
 }
