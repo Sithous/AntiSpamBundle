@@ -3,7 +3,6 @@ AntiSpamBundle
 
 Provides Anti-Spam capabilities to Symfony in an easy to use package.
 
-<<<<<<< HEAD
 Installation
 ------------
 
@@ -65,4 +64,3 @@ php app/console doctrine:schema:update --force
 ```
 
 # More to come...
->>>>>>> 1f9864ae127d1673f1f7c344cb86d4933d300300
