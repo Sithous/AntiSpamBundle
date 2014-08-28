@@ -4,7 +4,7 @@ AntiSpamBundle
 Provides Anti-Spam capabilities to Symfony in an easy to use package.
 
 
-We use composer for version control: https://packagist.org/packages/sithous/antispam-bundle
+We use composer! https://packagist.org/packages/sithous/antispam-bundle
 
 ## Requirements
 - Symfony 2.3
