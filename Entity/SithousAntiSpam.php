@@ -35,16 +35,6 @@ class SithousAntiSpam
     private $identifier;
 
     /**
-     * @var integer
-     */
-    private $maxCalls;
-
-    /**
-     * @var integer
-     */
-    private $maxTime;
-
-    /**
      * @var \DateTime
      */
     private $dateTime;
@@ -147,52 +137,6 @@ class SithousAntiSpam
     public function setIdentifier($identifier)
     {
         $this->identifier = $identifier;
-
-        return $this;
-    }
-
-    /**
-     * Get Max Calls
-     *
-     * @return int
-     */
-    public function getMaxCalls()
-    {
-        return $this->maxCalls;
-    }
-
-    /**
-     * Set Max Calls
-     *
-     * @param $maxCalls
-     * @return $this
-     */
-    public function setMaxCalls($maxCalls)
-    {
-        $this->maxCalls = $maxCalls;
-
-        return $this;
-    }
-
-    /**
-     * Get Max Time
-     *
-     * @return int
-     */
-    public function getMaxTime()
-    {
-        return $this->maxTime;
-    }
-
-    /**
-     * Set Max Time
-     *
-     * @param $maxTime
-     * @return $this
-     */
-    public function setMaxTime($maxTime)
-    {
-        $this->maxTime = $maxTime;
 
         return $this;
     }

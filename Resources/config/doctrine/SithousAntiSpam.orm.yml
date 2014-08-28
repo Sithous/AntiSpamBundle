@@ -12,18 +12,17 @@ Sithous\AntiSpamBundle\Entity\SithousAntiSpam:
         ip:
             type: string
             length: 45
+            nullable: true
         userObject:
             type: string
             length: 255
+            nullable: true
         userId:
             type: integer
+            nullable: true
         identifier:
             type: string
             length: 255
-        maxCalls:
-            type: integer
-        maxTime:
-            type: integer
         dateTime:
             type: datetime
     lifecycleCallbacks: {  }
