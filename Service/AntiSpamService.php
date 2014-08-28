@@ -6,7 +6,7 @@ use Symfony\Component\Config\Definition\Exception\Exception;
 use Sithous\AntiSpamBundle\Entity\SithousAntiSpam;
 use Symfony\Component\Security\Core\SecurityContext;
 
-class AntiSpam
+class AntiSpamService
 {
     /**
      * @var EntityManager
@@ -62,6 +62,14 @@ class AntiSpam
         $repository = $this->em->getRepository('SithousAntiSpamBundle:SithousAntiSpam');
 
         /**
+         * Lets first purge any old rows if config is set to not use cron
+         */
+        if($this->config['active_gc'])
+        {
+            $this->garbage_collector();
+        }
+
+        /**
          * make sure identifier was defined
          */
         if(!$this->getIdentifier())
@@ -85,7 +93,7 @@ class AntiSpam
             throw new \Exception('Both config options track_ip and track_user cannot be false (identifier: "'.$this->getIdentifier().'").');
         }
 
-        $user = $config['track_user'] ? ($this->getUser() ?: $this->getSecurityContextUser()) : null;
+        $user = $config['track_user'] ? ($this->getUser() ?: $this->_getSecurityContextUser()) : null;
         $ip = $config['track_ip'] ? ($this->getIp() ?: $_SERVER['REMOTE_ADDR']) : null;
         $this->_results = $repository->getUserActionCount($this->getIdentifier(), $config, $user, $ip);
 
@@ -111,19 +119,34 @@ class AntiSpam
         return true;
     }
 
+    /**
+     * Get error message.
+     *
+     * @todo get this using sprintf
+     * @param null $string
+     * @return mixed|string
+     */
     public function getErrorMessage($string = null)
     {
         $config = $this->getIdentifierConfig();
 
         $replace = array(
-            '[max_calls]' => $config['max_calls'],
-            '[max_time]'  => $config['max_time'],
-            '[time_left]' => $this->getWaitTime()
+            '{max_calls}'         => $config['max_calls'],
+            '{max_time}'          => $config['max_time'],
+            '{time_left}'         => $this->getWaitTime(),
+            '{time_left_hours}'   => gmdate('H', $this->getWaitTime()),
+            '{time_left_minutes}' => gmdate('i', $this->getWaitTime()),
+            '{time_left_seconds}' => gmdate('s', $this->getWaitTime()),
         );
 
-        return $config ? str_replace(array_keys($replace), array_values($replace), $string ?: "You can only do this [max_calls] time(s) in [max_time] seconds. \nYou must wait another [time_left] second(s).") : '';
+        return $config ? str_replace(array_keys($replace), array_values($replace), $string ?: "You must wait another {time_left} second(s).") : '';
     }
 
+    /**
+     * Get wait time in seconds.
+     *
+     * @return int
+     */
     public function getWaitTime()
     {
         if(!$this->getIdentifierConfig() || !isset($this->_results['oldest']) || !is_object($this->_results['oldest']))
@@ -221,7 +244,20 @@ class AntiSpam
         return isset($this->config['identifiers'][$identifier]) ? $this->config['identifiers'][$identifier] : null;
     }
 
-    private function getSecurityContextUser()
+    /**
+     * Run garbage collector
+     */
+    public function garbage_collector()
+    {
+        $this->em->getRepository('SithousAntiSpamBundle:SithousAntiSpam')->purgeOldRecords(isset($this->config['identifiers']) ? $this->config['identifiers'] : null);
+    }
+
+    /**
+     * Get the current user logged in
+     *
+     * @return bool|object
+     */
+    private function _getSecurityContextUser()
     {
         if (null === $token = $this->securityContext->getToken()) {
             return false;

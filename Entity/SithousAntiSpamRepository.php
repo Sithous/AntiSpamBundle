@@ -8,10 +8,7 @@ class SithousAntiSpamRepository extends EntityRepository
 {
     public function getUserActionCount($identifier, $config, $user, $ip)
     {
-        $repository = $this->getEntityManager()
-            ->getRepository('SithousAntiSpamBundle:SithousAntiSpam');
-
-        $query = $repository->createQueryBuilder('a')
+        $query = $this->createQueryBuilder('a')
             ->setMaxResults(1)
             ->andWhere('a.identifier = :identifier')
             ->setParameter('identifier', $identifier)
@@ -42,5 +39,27 @@ class SithousAntiSpamRepository extends EntityRepository
                     ->select('COUNT(a.id)')
                     ->getQuery()->getsinglescalarresult(),
         );
+    }
+
+    public function purgeOldRecords($identifiers)
+    {
+        $em = $this->getEntityManager();
+
+        foreach($identifiers as $identifier => $identifierData)
+        {
+            $results = $this->createQueryBuilder('a')
+                ->where('a.identifier = :identifier')
+                ->setParameter('identifier', $identifier)
+                ->andWhere('a.dateTime < :dateTime')
+                ->setParameter('dateTime', date('Y-m-d H:i:s', time() - $identifierData['max_time']))
+                ->getQuery()->getResult();
+
+            foreach($results as $result)
+            {
+                $em->remove($result);
+            }
+        }
+
+        $em->flush();
     }
 }

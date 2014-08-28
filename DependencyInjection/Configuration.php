@@ -23,6 +23,9 @@ class Configuration implements ConfigurationInterface
 
         $builder->root('sithous_anti_spam')
             ->children()
+                ->booleanNode('active_gc')
+                    ->defaultTrue()
+                ->end()
                 ->arrayNode('identifiers')
                     ->prototype('array')
                         ->children()
