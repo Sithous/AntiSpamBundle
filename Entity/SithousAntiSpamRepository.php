@@ -3,20 +3,21 @@
 namespace Sithous\AntiSpamBundle\Entity;
 
 use Doctrine\ORM\EntityRepository;
+use Sithous\AntiSpamBundle\Entity\SithousAntiSpamType;
 
 class SithousAntiSpamRepository extends EntityRepository
 {
-    public function getUserActionCount($identifier, $config, $user, $ip)
+    public function getUserActionCount(SithousAntiSpamType $type, $user, $ip)
     {
         $query = $this->createQueryBuilder('a')
             ->setMaxResults(1)
-            ->andWhere('a.identifier = :identifier')
-            ->setParameter('identifier', $identifier)
+            ->andWhere('a.type = :type')
+            ->setParameter('type', $type)
             ->andWhere('a.dateTime >= :before')
-            ->setParameter('before', date('Y-m-d H:i:s', time() - $config['max_time']))
+            ->setParameter('before', date('Y-m-d H:i:s', time() - $type->getMaxTime()))
             ->orderBy('a.dateTime', 'ASC');
 
-        if($config['track_user'] && $config['track_ip'])
+        if($type->getTrackUser() && $type->getTrackIp())
         {
             $query
                 ->andWhere('(a.ip = :ip OR a.userId = :userId AND a.userObject = :userObject)')
@@ -24,13 +25,13 @@ class SithousAntiSpamRepository extends EntityRepository
                 ->setParameter('userId', $user->getId())
                 ->setParameter('userObject', get_class($user));
         }
-        elseif($config['track_ip'])
+        elseif($type->getTrackIp())
         {
             $query
                 ->andWhere('a.ip = :ip')
                 ->setParameter('ip', $ip);
         }
-        elseif($config['track_user'])
+        elseif($type->getTrackUser())
         {
             $query
                 ->andWhere('a.userId = :userId')
@@ -50,23 +51,23 @@ class SithousAntiSpamRepository extends EntityRepository
 
     public function purgeOldRecords($identifiers)
     {
-        $em = $this->getEntityManager();
-
-        foreach($identifiers as $identifier => $identifierData)
-        {
-            $results = $this->createQueryBuilder('a')
-                ->where('a.identifier = :identifier')
-                ->setParameter('identifier', $identifier)
-                ->andWhere('a.dateTime < :dateTime')
-                ->setParameter('dateTime', date('Y-m-d H:i:s', time() - $identifierData['max_time']))
-                ->getQuery()->getResult();
-
-            foreach($results as $result)
-            {
-                $em->remove($result);
-            }
-        }
-
-        $em->flush();
+//        $em = $this->getEntityManager();
+//
+//        foreach($identifiers as $identifier => $identifierData)
+//        {
+//            $results = $this->createQueryBuilder('a')
+//                ->where('a.identifier = :identifier')
+//                ->setParameter('identifier', $identifier)
+//                ->andWhere('a.dateTime < :dateTime')
+//                ->setParameter('dateTime', date('Y-m-d H:i:s', time() - $identifierData['max_time']))
+//                ->getQuery()->getResult();
+//
+//            foreach($results as $result)
+//            {
+//                $em->remove($result);
+//            }
+//        }
+//
+//        $em->flush();
     }
 }

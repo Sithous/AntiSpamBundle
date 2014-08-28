@@ -1,0 +1,23 @@
+# track_ip: true
+# track_user: false
+# max_time: 120
+# max_calls: 1
+Sithous\AntiSpamBundle\Entity\SithousAntiSpamType:
+    type: entity
+    table: null
+    repositoryClass: Sithous\AntiSpamBundle\Entity\SithousAntiSpamTypeRepository
+    id:
+        id:
+            type: string
+            length: 255
+            id: true
+    fields:
+        trackIp:
+            type: boolean
+        trackUser:
+            type: boolean
+        maxTime:
+            type: integer
+        maxCalls:
+            type: integer
+    lifecycleCallbacks: {  }
