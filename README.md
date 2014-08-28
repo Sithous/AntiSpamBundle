@@ -7,9 +7,8 @@ Provides Anti-Spam capabilities to Symfony in an easy to use package.
 We use composer! https://packagist.org/packages/sithous/antispam-bundle
 
 ## Requirements
-- Symfony 2.3
+- => Symfony 2.3
 - Doctrine
-- Composer
 
 
 ## Installation
@@ -20,7 +19,7 @@ add the bundle to your root composer.json file under the `require` section
 ```
 "sithous/antispam-bundle": "1.0.*@dev"
 ```
- After adding that to the composre file run composer to fetch the package into your vendors folder
+ After adding that run composer to fetch the package into your vendors folder
 ```
 php composer.phar update
 ```
