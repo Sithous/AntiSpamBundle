@@ -3,15 +3,7 @@ AntiSpamBundle
 
 Provides Anti-Spam capabilities to Symfony in an easy to use package.
 
-Installation
-------------
 
-```mappings:
-    SithousAntiSpamBundle:
-        type: yml
-        is_bundle: true
-```
-=======
 We use composer for version control: https://packagist.org/packages/sithous/antispam-bundle
 
 ## Requirements
@@ -40,19 +32,7 @@ Enable the bundle by adding the following to the `app/config/appKernel.php`
 new Sithous\AntiSpamBundle\SithousAntiSpamBundle(),
 ```
 
-### Step 3: Modify Symfony config 
-
-The following needs to be added to `config.yml` under `orm:`
-
-```
-# app/config/config.yml
-        mappings:
-            SithousAntiSpamBundle:
-                type: yml
-                is_bundle: true
-```
-
-### Step 4: Update database
+### Step 3: Update database
 
 First, verify the SQL to make sure nothing will break
 ```
@@ -62,5 +42,3 @@ If everything looks good, execute the games.
 ```
 php app/console doctrine:schema:update --force
 ```
-
-# More to come...
