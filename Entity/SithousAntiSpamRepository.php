@@ -16,14 +16,21 @@ class SithousAntiSpamRepository extends EntityRepository
             ->setParameter('before', date('Y-m-d H:i:s', time() - $config['max_time']))
             ->orderBy('a.dateTime', 'ASC');
 
-        if($config['track_ip'])
+        if($config['track_user'] && $config['track_ip'])
+        {
+            $query
+                ->andWhere('(a.ip = :ip OR a.userId = :userId AND a.userObject = :userObject)')
+                ->setParameter('ip', $ip)
+                ->setParameter('userId', $user->getId())
+                ->setParameter('userObject', get_class($user));
+        }
+        elseif($config['track_ip'])
         {
             $query
                 ->andWhere('a.ip = :ip')
                 ->setParameter('ip', $ip);
         }
-
-        if($config['track_user'])
+        elseif($config['track_user'])
         {
             $query
                 ->andWhere('a.userId = :userId')
