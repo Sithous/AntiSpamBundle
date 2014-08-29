@@ -4,6 +4,7 @@ namespace Sithous\AntiSpamBundle\Service;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Sithous\AntiSpamBundle\Entity\SithousAntiSpam;
+use Sithous\AntiSpamBundle\Entity\SithousAntiSpamType;
 use Symfony\Component\Security\Core\SecurityContext;
 
 class AntiSpamService
@@ -31,7 +32,7 @@ class AntiSpamService
     /**
      * @var string
      */
-    private $_identifier;
+    private $_type;
 
     /**
      * @var string
@@ -66,38 +67,22 @@ class AntiSpamService
          */
         if($this->config['active_gc'])
         {
-            $this->garbage_collector();
+            $this->_garbage_collector();
         }
 
         /**
          * make sure identifier was defined
          */
-        if(!$this->getIdentifier())
+        if(!$this->getType())
         {
-            throw new \Exception('Identifier was never set.');
+            throw new \Exception('AntiSpamType was never set.');
         }
 
-        /**
-         * verify identifier config can be found
-         */
-        if(!$config = $this->getIdentifierConfig())
-        {
-            throw new \Exception('Identifier "'.$this->getIdentifier().'" is not defined in the config.yml');
-        }
+        $user = $this->getType()->getTrackUser() ? ($this->getUser() ?: $this->_getSecurityContextUser()) : null;
+        $ip = $this->getType()->getTrackIp() ? ($this->getIp() ?: $_SERVER['REMOTE_ADDR']) : null;
+        $this->_results = $repository->getUserActionCount($this->getType(), $user, $ip);
 
-        /**
-         * make sure track_ip and track_user are not both false.
-         */
-        if(!$config['track_ip'] && !$config['track_user'])
-        {
-            throw new \Exception('Both config options track_ip and track_user cannot be false (identifier: "'.$this->getIdentifier().'").');
-        }
-
-        $user = $config['track_user'] ? ($this->getUser() ?: $this->_getSecurityContextUser()) : null;
-        $ip = $config['track_ip'] ? ($this->getIp() ?: $_SERVER['REMOTE_ADDR']) : null;
-        $this->_results = $repository->getUserActionCount($this->getIdentifier(), $config, $user, $ip);
-
-        if($this->_results['count'] >= $config['max_calls'])
+        if($this->_results['count'] >= $this->getType()->getMaxCalls())
         {
             return false;
         }
@@ -106,7 +91,7 @@ class AntiSpamService
         {
             $entity = new SithousAntiSpam();
             $entity
-                ->setIdentifier($this->getIdentifier())
+                ->setType($this->getType())
                 ->setDateTime(new \DateTime())
                 ->setIp($ip)
                 ->setUserId($user ? $user->getId() : null)
@@ -128,18 +113,21 @@ class AntiSpamService
      */
     public function getErrorMessage($string = null)
     {
-        $config = $this->getIdentifierConfig();
+        if(!$this->getType())
+        {
+            return '';
+        }
 
         $replace = array(
-            '{max_calls}'         => $config['max_calls'],
-            '{max_time}'          => $config['max_time'],
+            '{max_calls}'         => $this->getType()->getMaxCalls(),
+            '{max_time}'          => $this->getType()->getMaxTime(),
             '{time_left}'         => $this->getWaitTime(),
             '{time_left_hours}'   => gmdate('H', $this->getWaitTime()),
             '{time_left_minutes}' => gmdate('i', $this->getWaitTime()),
             '{time_left_seconds}' => gmdate('s', $this->getWaitTime()),
         );
 
-        return $config ? str_replace(array_keys($replace), array_values($replace), $string ?: "You must wait another {time_left} second(s).") : '';
+        return str_replace(array_keys($replace), array_values($replace), $string ?: "You must wait another {time_left} second(s).");
     }
 
     /**
@@ -149,36 +137,39 @@ class AntiSpamService
      */
     public function getWaitTime()
     {
-        if(!$this->getIdentifierConfig() || !isset($this->_results['oldest']) || !is_object($this->_results['oldest']))
+        if(!$this->getType() || !isset($this->_results['oldest']) || !is_object($this->_results['oldest']))
         {
             return 0;
         }
 
-        return $this->getIdentifierConfig()['max_time'] - (time() - $this->_results['oldest']->getDateTime()->getTimestamp());
+        return $this->getType()->getMaxTime() - (time() - $this->_results['oldest']->getDateTime()->getTimestamp());
     }
 
     /**
-     * Set Identifier string
+     * Set SithousAntiSpamType
      *
-     * @param $identifier
+     * @param $identifier string
      * @throws \Exception
      * @return $this
      */
-    public function setIdentifier($identifier)
+    public function setType($identifier)
     {
-        $this->_identifier = $identifier;
+        if(!$this->_type = $this->em->getRepository('SithousAntiSpamBundle:SithousAntiSpamType')->findOneById($identifier))
+        {
+            throw new \Exception('Could not find SithousAntiSpamType "'.$identifier.'" in the database.');
+        }
 
         return $this;
     }
 
     /**
-     * Get Identifier string
+     * Get SithousAntiSpamType
      *
-     * @return mixed
+     * @return null|SithousAntiSpamType
      */
-    public function getIdentifier()
+    public function getType()
     {
-        return $this->_identifier;
+        return $this->_type;
     }
 
     /**
@@ -228,28 +219,30 @@ class AntiSpamService
     }
 
     /**
-     * Get config for identifier
-     *
-     * @param null $identifier
-     * @return mixed
-     * @throws \Exception
-     */
-    public function getIdentifierConfig($identifier = null)
-    {
-        if(!$identifier)
-        {
-            $identifier = $this->getIdentifier();
-        }
-
-        return isset($this->config['identifiers'][$identifier]) ? $this->config['identifiers'][$identifier] : null;
-    }
-
-    /**
      * Run garbage collector
      */
-    public function garbage_collector()
+    public function _garbage_collector()
     {
-        $this->em->getRepository('SithousAntiSpamBundle:SithousAntiSpam')->purgeOldRecords(isset($this->config['identifiers']) ? $this->config['identifiers'] : null);
+        $typeRepository = $this->em->getRepository('SithousAntiSpamBundle:SithousAntiSpamType');
+        $repository = $this->em->getRepository('SithousAntiSpamBundle:SithousAntiSpam');
+
+        /**
+         * @var $type SithousAntiSpamType
+         */
+        foreach($typeRepository->findAll() as $type)
+        {
+            foreach($repository->createQueryBuilder('a')
+                        ->where('a.type = :type')
+                        ->setParameter('type', $type)
+                        ->andWhere("a.dateTime < :dateTime")
+                        ->setParameter('dateTime', date('Y-m-d H:i:s', time() - $type->getMaxTime()))
+                        ->getQuery()->getResult() as $result)
+            {
+                $this->em->remove($result);
+            }
+        }
+
+        $this->em->flush();
     }
 
     /**

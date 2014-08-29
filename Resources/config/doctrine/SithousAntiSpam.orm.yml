@@ -20,9 +20,14 @@ Sithous\AntiSpamBundle\Entity\SithousAntiSpam:
         userId:
             type: integer
             nullable: true
-        identifier:
-            type: string
-            length: 255
         dateTime:
             type: datetime
+    manyToOne:
+        type:
+            targetEntity: Sithous\AntiSpamBundle\Entity\SithousAntiSpamType
+            inversedBy: SithousAntiSpam
+            joinColumn:
+                name: type_id
+                referencedColumnName: id
+                onDelete: CASCADE
     lifecycleCallbacks: {  }

@@ -30,14 +30,14 @@ class SithousAntiSpam
     private $userId;
 
     /**
-     * @var string
-     */
-    private $identifier;
-
-    /**
      * @var \DateTime
      */
     private $dateTime;
+
+    /**
+     * @var SithousAntiSpamType
+     */
+    private $type;
 
     /**
      * Get id
@@ -119,29 +119,6 @@ class SithousAntiSpam
     }
 
     /**
-     * Get Identifier
-     *
-     * @return string
-     */
-    public function getIdentifier()
-    {
-        return $this->identifier;
-    }
-
-    /**
-     * Set Identifier
-     *
-     * @param string $identifier
-     * @return $this
-     */
-    public function setIdentifier($identifier)
-    {
-        $this->identifier = $identifier;
-
-        return $this;
-    }
-
-    /**
      * Get DateTime
      *
      * @return \DateTime
@@ -162,5 +139,28 @@ class SithousAntiSpam
         $this->dateTime = $dateTime;
 
         return $this;
+    }
+
+    /**
+     * Set SithousAntiSpamType
+     *
+     * @param SithousAntiSpamType $type
+     * @return $this
+     */
+    public function setType(SithousAntiSpamType $type)
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * Get SithousAntiSpamType
+     *
+     * @return SithousAntiSpamType
+     */
+    public function getType()
+    {
+        return $this->type;
     }
 }
