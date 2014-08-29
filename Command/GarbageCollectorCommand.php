@@ -23,7 +23,7 @@ class GarbageCollectorCommand extends ContainerAwareCommand
         $antiSpamService = $this->getContainer()->get('sithous.antispam');
 
         $start_time = microtime(true);
-        $antiSpamService->garbage_collector();
+        $antiSpamService->_garbage_collector();
 
         if($input->getOption('time'))
         {

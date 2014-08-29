@@ -32,7 +32,7 @@ class AntiSpamService
     /**
      * @var string
      */
-    private $_identifier;
+    private $_type;
 
     /**
      * @var string
@@ -67,7 +67,7 @@ class AntiSpamService
          */
         if($this->config['active_gc'])
         {
-            $this->garbage_collector();
+            $this->_garbage_collector();
         }
 
         /**
@@ -154,7 +154,7 @@ class AntiSpamService
      */
     public function setType($identifier)
     {
-        if(!$this->_identifier = $this->em->getRepository('SithousAntiSpamBundle:SithousAntiSpam')->findOneById($identifier))
+        if(!$this->_type = $this->em->getRepository('SithousAntiSpamBundle:SithousAntiSpamType')->findOneById($identifier))
         {
             throw new \Exception('Could not find SithousAntiSpamType "'.$identifier.'" in the database.');
         }
@@ -169,7 +169,7 @@ class AntiSpamService
      */
     public function getType()
     {
-        return $this->_identifier;
+        return $this->_type;
     }
 
     /**
@@ -221,15 +221,28 @@ class AntiSpamService
     /**
      * Run garbage collector
      */
-    public function garbage_collector()
+    public function _garbage_collector()
     {
-//        $repository = $this->em->getRepository('SithousAntiSpamBundle:SithousAntiSpam');
-//
-//        $results = $repository->createQueryBuilder('a')
-//            ->join('SithousAntiSpamBundle:SithousAntiSpamType', 't')
-//            ->andWhere('a.dateTime < :dateTime')
-//            ->setParameter('dateTime', date('Y-m-d H:i:s', time() - $identifierData['max_time']))
-//            ->getQuery()->getResult();
+        $typeRepository = $this->em->getRepository('SithousAntiSpamBundle:SithousAntiSpamType');
+        $repository = $this->em->getRepository('SithousAntiSpamBundle:SithousAntiSpam');
+
+        /**
+         * @var $type SithousAntiSpamType
+         */
+        foreach($typeRepository->findAll() as $type)
+        {
+            foreach($repository->createQueryBuilder('a')
+                        ->where('a.type = :type')
+                        ->setParameter('type', $type)
+                        ->andWhere("a.dateTime < :dateTime")
+                        ->setParameter('dateTime', date('Y-m-d H:i:s', time() - $type->getMaxTime()))
+                        ->getQuery()->getResult() as $result)
+            {
+                $this->em->remove($result);
+            }
+        }
+
+        $this->em->flush();
     }
 
     /**
