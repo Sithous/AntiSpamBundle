@@ -9,6 +9,7 @@ Check us out on packagist! https://packagist.org/packages/sithous/antispam-bundl
 We recommend using fixtures to load in your `SithousAntiSpamTypes` so they can be moved to the production server or vice versa.
 
 ## Requirements
+- => PHP 5.4
 - => Symfony 2.3
 - Doctrine
 
@@ -59,7 +60,7 @@ php app/console sithous:antispambundle:gc
 
 ## Example Usage
 
-A good example is if you want users to be able to vote on something but only want the user to vote once a day. To do this you would first generate the SithousAntiSpamType using the following command:
+A good example is if you want users to be able to vote on something but only want the user and IP of user to vote once a day. To do this you would first generate the SithousAntiSpamType using the following command:
 ```
 $ php app/console sithous:antispam:generate
 Please enter the ID for this type: vote_protection
