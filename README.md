@@ -9,8 +9,9 @@ Check us out on packagist! https://packagist.org/packages/sithous/antispam-bundl
 We recommend using fixtures to load in your `SithousAntiSpamTypes` so they can be moved to the production server or vice versa.
 
 ## Requirements
-- => PHP 5.4
+- => PHP 5.3.2
 - => Symfony 2.3
+- => Symfony Console 2.3
 - Doctrine
 
 
