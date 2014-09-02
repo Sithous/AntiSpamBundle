@@ -21,7 +21,7 @@ We recommend using fixtures to load in your `SithousAntiSpamTypes` so they can b
 
 add the bundle to your root composer.json file under the `require` section
 ```
-"sithous/antispam-bundle": "1.0.*@dev"
+"sithous/antispam-bundle": "1.0.*"
 ```
  After adding that run composer to fetch the package into your vendors folder
 ```
