@@ -38,6 +38,18 @@ class SithousAntiSpam
      * @var SithousAntiSpamType
      */
     private $type;
+    
+    /**
+     * Set id
+     * 
+     * @return $this
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+        
+        return $this;
+    }
 
     /**
      * Get id
