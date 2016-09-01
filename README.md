@@ -86,7 +86,7 @@ Now in your controller function you will run the verify command before submittin
         // somewhere in your code...
         
         $spamCheck = $this->get('sithous.antispam');
-        if(!$spamCheck->setIdentifier('vote_protection')->verify())
+        if(!$spamCheck->setType('vote_protection')->verify())
         {
             return new JsonResponse(array(
                 'result'  => 'error',
