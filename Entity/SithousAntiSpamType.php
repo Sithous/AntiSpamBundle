@@ -2,6 +2,7 @@
 
 namespace Sithous\AntiSpamBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -33,6 +34,16 @@ class SithousAntiSpamType
      * @var integer
      */
     private $maxCalls;
+
+    /**
+     * @var ArrayCollection|SithousAntiSpam[]
+     */
+    private $sithousAntiSpams;
+
+    public function __construct()
+    {
+        $this->sithousAntiSpams = new ArrayCollection();
+    }
 
     /**
      * Get id
@@ -146,6 +157,34 @@ class SithousAntiSpamType
     {
         $this->maxCalls = $maxCalls;
 
+        return $this;
+    }
+
+    public function getSithousAntiSpams()
+    {
+        return $this->sithousAntiSpams;
+    }
+
+    public function setSithousAntiSpams($sithousAntiSpams)
+    {
+        $this->sithousAntiSpams = $sithousAntiSpams;
+    }
+
+    public function addSithousAntiSpam(SithousAntiSpam $sithousAntiSpam)
+    {
+        $this->sithousAntiSpams->add($sithousAntiSpam);
+        return $this;
+    }
+
+    public function removeSithousAntiSpam(SithousAntiSpam $sithousAntiSpam)
+    {
+        $this->sithousAntiSpams->removeElement($sithousAntiSpam);
+        return $this;
+    }
+
+    public function clearSithousAntiSpams()
+    {
+        $this->sithousAntiSpams->clear();
         return $this;
     }
 }

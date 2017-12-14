@@ -20,4 +20,8 @@ Sithous\AntiSpamBundle\Entity\SithousAntiSpamType:
             type: integer
         maxCalls:
             type: integer
+    oneToMany:
+        sithousAntiSpams:
+            targetEntity: Sithous\AntiSpamBundle\Entity\SithousAntiSpam
+            mappedBy: type
     lifecycleCallbacks: {  }
